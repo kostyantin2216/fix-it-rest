@@ -11,8 +11,8 @@ public enum ServiceError {
 	
 	MISSING_DATA(1),
 	INVALID_DATA(2),
-	SYNCHRONIZATION(10),
-	SEARCH(11);
+	UNSUPPORTED(3),
+	UNKNOWN(4);
 	
 	public final int code;
 	

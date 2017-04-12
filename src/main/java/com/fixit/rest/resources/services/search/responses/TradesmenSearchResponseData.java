@@ -8,23 +8,23 @@ import com.fixit.rest.resources.services.responses.ResponseData;
  */
 public class TradesmenSearchResponseData implements ResponseData {
 
-	private String searchId;
+	private String searchKey;
 
-	public TradesmenSearchResponseData(String searchId) {
-		this.searchId = searchId;
+	public TradesmenSearchResponseData(String searchKey) {
+		this.searchKey = searchKey;
 	}
 
-	public String getSearchId() {
-		return searchId;
+	public String getSearchKey() {
+		return searchKey;
 	}
 
-	public void setSearchId(String searchId) {
-		this.searchId = searchId;
+	public void setSearchKey(String searchKey) {
+		this.searchKey = searchKey;
 	}
 
 	@Override
 	public String toString() {
-		return "TradesmenSearchResponseData [searchId=" + searchId + "]";
+		return "TradesmenSearchResponseData [searchKey=" + searchKey + "]";
 	}
 	
 }

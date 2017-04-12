@@ -44,7 +44,7 @@ public class SynchronizationServiceResource extends BaseServiceResource {
 			TaskResult<List<SynchronizationResult>> result = synchronizationTask.process(reqData.getSynchronizationHistory());
 		
 			if(result.isCriticalError()) {
-				respHeader.addError(ServiceError.SYNCHRONIZATION, "Could not synchronize due to: " + result.getFirstError().getMsg());
+				respHeader.addError(ServiceError.UNKNOWN, "Could not synchronize due to: " + result.getFirstError().getMsg());
 			} else {
 				return new ServiceResponse<SynchronizationResponseData>(respHeader, new SynchronizationResponseData(result.getResult()));
 			}

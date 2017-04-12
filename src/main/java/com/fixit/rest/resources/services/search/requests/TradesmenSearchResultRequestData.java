@@ -15,29 +15,29 @@ import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
  */
 public class TradesmenSearchResultRequestData implements RequestData {
 	
-	private String searchId;
+	private String searchKey;
 
-	public TradesmenSearchResultRequestData(String searchId) {
-		this.searchId = searchId;
+	public TradesmenSearchResultRequestData(String searchKey) {
+		this.searchKey = searchKey;
 	}
 
-	public String getSearchId() {
-		return searchId;
+	public String getSearchKey() {
+		return searchKey;
 	}
 
-	public void setSearchId(String searchId) {
-		this.searchId = searchId;
+	public void setSearchKey(String searchKey) {
+		this.searchKey = searchKey;
 	}
-	
+
 	public void validate(ServiceResponseHeader respHeader) {
-		if(StringUtils.isEmpty(searchId)) {
+		if(StringUtils.isEmpty(searchKey)) {
 			respHeader.addError(ServiceError.MISSING_DATA, "cannot fetch results without a searchId");
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "TradesmenSearchResultResponseData [searchId=" + searchId + "]";
+		return "TradesmenSearchResultRequestData [sarchKey=" + searchKey + "]";
 	}
 	
 }

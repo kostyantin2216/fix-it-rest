@@ -6,6 +6,7 @@ package com.fixit.rest.resources.services.search;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -48,7 +49,7 @@ public class SearchServiceResource extends BaseServiceResource {
 		this.mSearchExecutor = searchExecutor;
 	}
 	
-	@POST
+	@GET
 	@Path("startTradesmanSearch")
 	public ServiceResponse<TradesmenSearchResponseData> startTradesmanSearch(ServiceRequest<TradesmenSearchRequestData> request) {
 		ServiceResponseHeader respHeader = createHeader();
@@ -70,7 +71,7 @@ public class SearchServiceResource extends BaseServiceResource {
 				
 				return new ServiceResponse<TradesmenSearchResponseData>(respHeader, new TradesmenSearchResponseData(searchId));
 			} else {
-				respHeader.addError(ServiceError.SEARCH, "location unsupported");
+				respHeader.addError(ServiceError.UNSUPPORTED, "location unsupported");
 			}
 		}
 		
@@ -85,7 +86,7 @@ public class SearchServiceResource extends BaseServiceResource {
 		
 		reqData.validate(respHeader);
 		if(!respHeader.hasErrors()) {
-			SearchResult searchResult = mSearchExecutor.getResult(reqData.getSearchId());
+			SearchResult searchResult = mSearchExecutor.getResult(reqData.getSearchKey());
 			
 			TradesmenSearchResultResponseData respData = new TradesmenSearchResultResponseData();
 			if(searchResult.isComplete) {
@@ -101,7 +102,7 @@ public class SearchServiceResource extends BaseServiceResource {
 						respData.setReviewCountForTradesmen(reviewsForTradesman);
 					}
 				} else {
-					respHeader.addError(ServiceError.SEARCH, searchResult.errorToString());
+					respHeader.addError(ServiceError.UNKNOWN, searchResult.errorToString());
 				}
 			}
 			return new ServiceResponse<TradesmenSearchResultResponseData>(respHeader, respData);
