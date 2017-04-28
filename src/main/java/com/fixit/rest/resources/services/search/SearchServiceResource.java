@@ -6,13 +6,15 @@ package com.fixit.rest.resources.services.search;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fixit.components.search.SearchExecutor;
+import com.fixit.components.search.SearchParams;
+import com.fixit.components.search.SearchResult;
 import com.fixit.core.config.CoreContextProvider;
 import com.fixit.core.dao.mongo.MapAreaDao;
 import com.fixit.core.dao.sql.ReviewDao;
@@ -20,9 +22,6 @@ import com.fixit.core.data.MapAreaType;
 import com.fixit.core.data.MutableLatLng;
 import com.fixit.core.data.mongo.MapArea;
 import com.fixit.core.data.mongo.Tradesman;
-import com.fixit.core.search.SearchExecutor;
-import com.fixit.core.search.SearchParams;
-import com.fixit.core.search.SearchResult;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.requests.ServiceRequest;
@@ -49,7 +48,7 @@ public class SearchServiceResource extends BaseServiceResource {
 		this.mSearchExecutor = searchExecutor;
 	}
 	
-	@GET
+	@POST
 	@Path("startTradesmanSearch")
 	public ServiceResponse<TradesmenSearchResponseData> startTradesmanSearch(ServiceRequest<TradesmenSearchRequestData> request) {
 		ServiceResponseHeader respHeader = createHeader();
@@ -93,8 +92,10 @@ public class SearchServiceResource extends BaseServiceResource {
 				respData.setComplete(true);
 				if(searchResult.errors.isEmpty()) {
 					if(!searchResult.tradesmen.isEmpty()) {
+						respData.setTradesmen(searchResult.tradesmen);
+						
 						ReviewDao reviewDao = CoreContextProvider.getReviewDao();
-						Map<String, Integer> reviewsForTradesman = new HashMap<>();
+						Map<String, Long> reviewsForTradesman = new HashMap<>();
 						for(Tradesman tradesman : searchResult.tradesmen) {
 							String tradesmanId = tradesman.get_id().toString();
 							reviewsForTradesman.put(tradesmanId, reviewDao.getCountForTradesman(tradesmanId));

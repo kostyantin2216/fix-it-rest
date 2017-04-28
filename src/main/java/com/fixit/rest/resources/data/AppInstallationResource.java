@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fixit.core.dao.sql.AppInstallationDao;
+import com.fixit.core.dao.mongo.AppInstallationDao;
 import com.fixit.core.data.mongo.AppInstallation;
 
 /**

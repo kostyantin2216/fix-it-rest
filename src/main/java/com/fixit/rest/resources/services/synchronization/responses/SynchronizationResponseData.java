@@ -5,7 +5,7 @@ package com.fixit.rest.resources.services.synchronization.responses;
 
 import java.util.List;
 
-import com.fixit.core.synchronization.SynchronizationResult;
+import com.fixit.components.synchronization.SynchronizationResult;
 import com.fixit.rest.resources.services.responses.ResponseData;
 
 /**

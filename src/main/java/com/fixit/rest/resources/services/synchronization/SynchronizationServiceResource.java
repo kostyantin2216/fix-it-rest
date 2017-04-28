@@ -9,10 +9,10 @@ import javax.ws.rs.POST;
 
 import org.springframework.stereotype.Component;
 
+import com.fixit.components.synchronization.SynchronizationResult;
+import com.fixit.components.synchronization.SynchronizationTask;
 import com.fixit.core.config.CoreContextProvider;
 import com.fixit.core.dao.mongo.SynchronizationParamsDao;
-import com.fixit.core.synchronization.SynchronizationResult;
-import com.fixit.core.synchronization.SynchronizationTask;
 import com.fixit.core.tasks.TaskResult;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
@@ -35,18 +35,24 @@ public class SynchronizationServiceResource extends BaseServiceResource {
 	@SuppressWarnings("rawtypes")
 	public ServiceResponse<SynchronizationResponseData> synchronize(ServiceRequest<SynchronizationRequestData> request) {
 		ServiceResponseHeader respHeader = createHeader();
-		SynchronizationRequestData reqData = request.getData();
-		
-		reqData.validate(respHeader);
-		if(!respHeader.hasErrors()) {
-			SynchronizationParamsDao synchronizationParamsDao = CoreContextProvider.getSynchronizationParamsDao();
-			SynchronizationTask synchronizationTask = new SynchronizationTask(synchronizationParamsDao, reqData.getFirstSynchronization());
-			TaskResult<List<SynchronizationResult>> result = synchronizationTask.process(reqData.getSynchronizationHistory());
-		
-			if(result.isCriticalError()) {
-				respHeader.addError(ServiceError.UNKNOWN, "Could not synchronize due to: " + result.getFirstError().getMsg());
+		if(request != null) {
+			SynchronizationRequestData reqData = request.getData();
+			
+			if(reqData != null) {
+				reqData.validate(respHeader);
+				if(!respHeader.hasErrors()) {
+					SynchronizationParamsDao synchronizationParamsDao = CoreContextProvider.getSynchronizationParamsDao();
+					SynchronizationTask synchronizationTask = new SynchronizationTask(synchronizationParamsDao, reqData.getLastSynchronization());
+					TaskResult<List<SynchronizationResult>> result = synchronizationTask.process(reqData.getSynchronizationHistory());
+				
+					if(result.isCriticalError()) {
+						respHeader.addError(ServiceError.UNKNOWN, "Could not synchronize due to: " + result.getFirstError().getMsg());
+					} else {
+						return new ServiceResponse<SynchronizationResponseData>(respHeader, new SynchronizationResponseData(result.getResult()));
+					}
+				}
 			} else {
-				return new ServiceResponse<SynchronizationResponseData>(respHeader, new SynchronizationResponseData(result.getResult()));
+				respHeader.addError(ServiceError.MISSING_DATA, "cannot proceed without data");
 			}
 		}
 		return new ServiceResponse<SynchronizationResponseData>(respHeader, null);

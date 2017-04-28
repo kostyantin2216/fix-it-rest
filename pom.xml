@@ -8,9 +8,10 @@
   
   	<properties>
   		<core.version>0.0.1-SNAPSHOT</core.version>
+  		<components.version>0.0.1-SNAPSHOT</components.version>
 		<spring.version>4.3.4.RELEASE</spring.version>
 		<servlet.version>2.5</servlet.version>
-		<jersey.version>2.22.2</jersey.version>
+		<jersey.version>2.24.1</jersey.version>
 	</properties>
   
   	<dependencies>
@@ -19,6 +20,12 @@
   			<groupId>com.fix-it</groupId>
   			<artifactId>fix-it-core</artifactId>
   			<version>${core.version}</version>
+  		</dependency>
+  		
+  		<dependency>
+  			<groupId>com.fix-it</groupId>
+  			<artifactId>fix-it-components</artifactId>
+  			<version>${components.version}</version>
   		</dependency>
   		
   		<!-- Spring -->  		
@@ -34,6 +41,7 @@
 			<artifactId>servlet-api</artifactId>
 			<version>${servlet.version}</version>
 		</dependency>
+		
         
         <!-- Jersey -->
 		<dependency>

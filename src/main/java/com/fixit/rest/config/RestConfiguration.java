@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"com.fixit.rest"})
-public class MIRestConfiguration {
+public class RestConfiguration {
 	
 }

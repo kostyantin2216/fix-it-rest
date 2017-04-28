@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-import com.fixit.core.synchronization.SynchronizationAction;
+import com.fixit.core.data.SynchronizationAction;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.requests.RequestData;
 import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
@@ -18,22 +18,22 @@ import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
  */
 public class SynchronizationRequestData implements RequestData {
 
-	private Date firstSynchronization;
+	private Date lastSynchronization;
     private Map<String, Set<SynchronizationAction>> synchronizationHistory;
 
     public SynchronizationRequestData() { }
 
     public SynchronizationRequestData(Date firstSynchronization, Map<String, Set<SynchronizationAction>> synchronizationHistory) {
-        this.firstSynchronization = firstSynchronization;
+        this.lastSynchronization = firstSynchronization;
         this.synchronizationHistory = synchronizationHistory;
     }
 
-    public Date getFirstSynchronization() {
-        return firstSynchronization;
+    public Date getLastSynchronization() {
+        return lastSynchronization;
     }
 
-    public void setFirstSynchronization(Date firstSynchronization) {
-        this.firstSynchronization = firstSynchronization;
+    public void setLastSynchronization(Date lastSynchronization) {
+        this.lastSynchronization = lastSynchronization;
     }
 
     public Map<String, Set<SynchronizationAction>> getSynchronizationHistory() {
@@ -45,7 +45,7 @@ public class SynchronizationRequestData implements RequestData {
     }
     
     public void validate(ServiceResponseHeader respHeader) {
-    	if(firstSynchronization == null) {
+    	if(lastSynchronization == null) {
     		respHeader.addError(ServiceError.MISSING_DATA, "Cannot synchronize without firstSynchronization");
     	}
     	if(synchronizationHistory == null || synchronizationHistory.isEmpty()) {
@@ -64,7 +64,7 @@ public class SynchronizationRequestData implements RequestData {
 
 	@Override
 	public String toString() {
-		return "AppSynchronizationRequestData [firstSynchronization=" + firstSynchronization
+		return "AppSynchronizationRequestData [lastSynchronization=" + lastSynchronization
 				+ ", synchronizationHistory=" + synchronizationHistory + "]";
 	}
 	

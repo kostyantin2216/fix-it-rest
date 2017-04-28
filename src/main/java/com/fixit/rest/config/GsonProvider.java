@@ -28,10 +28,7 @@ import com.google.gson.Gson;
 @Consumes(MediaType.APPLICATION_JSON)
 public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
-    private static final String PRETTY_PRINT = "pretty-print";
-
     private final Gson gson;
-    private final Gson prettyGson;
 
     @Context
     private UriInfo ui;
@@ -39,8 +36,8 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
     public GsonProvider() {
         GsonManager gsonManager = CoreContextProvider.getGsonManager();
 
-        this.gson = gsonManager.getRestResourceGson();
-        this.prettyGson = gsonManager.getRestResourcePrettyGson();
+        this.gson = gsonManager.getRestResourceGsonBuilder()
+        		.create();
     }
 
     @Override
@@ -56,7 +53,7 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
 
         InputStreamReader reader = new InputStreamReader(entityStream, "UTF-8");
         try {
-            return gson.fromJson(reader, type);
+            return gson.fromJson(reader, genericType);
         } finally {
             reader.close();
         }
@@ -80,12 +77,7 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                         OutputStream entityStream) throws IOException, WebApplicationException {
         PrintWriter printWriter = new PrintWriter(entityStream);
         try {
-            String json;
-            if (ui.getQueryParameters().containsKey(PRETTY_PRINT)){
-                json = prettyGson.toJson(t);
-            } else {
-                json = gson.toJson(t);
-            }
+            String json = gson.toJson(t);
             printWriter.write(json);
             printWriter.flush();
         } finally {

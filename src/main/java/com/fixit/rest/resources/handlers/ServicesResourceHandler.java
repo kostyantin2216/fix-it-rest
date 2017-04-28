@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.fixit.rest.resources.RestResource;
 import com.fixit.rest.resources.services.search.SearchServiceResource;
 import com.fixit.rest.resources.services.synchronization.SynchronizationServiceResource;
+import com.fixit.rest.resources.services.test.TestServiceResource;
 
 /**
  * @author 		Kostyantin
@@ -39,6 +40,11 @@ public class ServicesResourceHandler implements RestResource {
 	@Path(SynchronizationServiceResource.END_POINT)
 	public SynchronizationServiceResource getSynchronizationServiceResource() {
 		return context.getResource(SynchronizationServiceResource.class);
+	}
+	
+	@Path(TestServiceResource.END_POINT)
+	public TestServiceResource getTestServiceResource() {
+		return context.getResource(TestServiceResource.class);
 	}
 	
 	@Override

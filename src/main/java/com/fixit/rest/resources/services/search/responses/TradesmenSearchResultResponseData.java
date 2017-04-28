@@ -17,12 +17,12 @@ public class TradesmenSearchResultResponseData implements ResponseData {
 
 	private boolean complete;
 	private List<Tradesman> tradesmen;
-	private Map<String, Integer> reviewCountForTradesmen;
+	private Map<String, Long> reviewCountForTradesmen;
 	
 	public TradesmenSearchResultResponseData() { }
 
 	public TradesmenSearchResultResponseData(boolean complete, List<Tradesman> tradesmen,
-			Map<String, Integer> reviewCountForTradesmen) {
+			Map<String, Long> reviewCountForTradesmen) {
 		this.complete = complete;
 		this.tradesmen = tradesmen;
 		this.reviewCountForTradesmen = reviewCountForTradesmen;
@@ -44,11 +44,11 @@ public class TradesmenSearchResultResponseData implements ResponseData {
 		this.tradesmen = tradesmen;
 	}
 
-	public Map<String, Integer> getReviewCountForTradesmen() {
+	public Map<String, Long> getReviewCountForTradesmen() {
 		return reviewCountForTradesmen;
 	}
 
-	public void setReviewCountForTradesmen(Map<String, Integer> reviewCountForTradesmen) {
+	public void setReviewCountForTradesmen(Map<String, Long> reviewCountForTradesmen) {
 		this.reviewCountForTradesmen = reviewCountForTradesmen;
 	}
 
