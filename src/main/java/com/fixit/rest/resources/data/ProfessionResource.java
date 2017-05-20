@@ -7,7 +7,7 @@ import com.fixit.core.dao.sql.ProfessionDao;
 import com.fixit.core.data.sql.Profession;
 
 @Component
-public class ProfessionResource extends DataAccessResource<Profession, Integer> {
+public class ProfessionResource extends DataAccessResource<ProfessionDao, Profession, Integer> {
 
 	public final static String END_POINT = "Professions";
 	

@@ -8,7 +8,7 @@ import com.fixit.core.dao.mongo.TradesmanDao;
 import com.fixit.core.data.mongo.Tradesman;
 
 @Component
-public class TradesmanResource extends DataAccessResource<Tradesman, ObjectId> {
+public class TradesmanResource extends DataAccessResource<TradesmanDao, Tradesman, ObjectId> {
 
 	public final static String END_POINT = "Tradesmen";
 	

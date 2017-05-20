@@ -7,7 +7,7 @@ import com.fixit.core.dao.sql.TradesmanStatisticsDao;
 import com.fixit.core.data.sql.TradesmanStatistics;
 
 @Component
-public class TradesmanStatisticsResource extends DataAccessResource<TradesmanStatistics, String> {
+public class TradesmanStatisticsResource extends DataAccessResource<TradesmanStatisticsDao, TradesmanStatistics, String> {
 
 	public final static String END_POINT = "TradesmanStatistics";
 	

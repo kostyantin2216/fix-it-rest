@@ -8,7 +8,7 @@ import com.fixit.core.data.sql.Review;
 import com.fixit.core.data.sql.Review.ReviewPK;
 
 @Component
-public class ReviewResource extends DataAccessResource<Review, ReviewPK> {
+public class ReviewResource extends DataAccessResource<ReviewDao, Review, ReviewPK> {
 
 	public final static String END_POINT = "Reviews";
 	

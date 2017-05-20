@@ -12,13 +12,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import com.fixit.core.dao.CommonDao;
+import com.fixit.core.dao.queries.DataResourceQuery;
 import com.fixit.core.data.DataModelObject;
 
-public abstract class DataAccessResource<E extends DataModelObject<ID>, ID extends Serializable> implements CommonDataResource<E, ID> {
+public abstract class DataAccessResource<DAO extends CommonDao<E, ID>, E extends DataModelObject<ID>, ID extends Serializable> 
+	implements CommonDataResource<E, ID> {
 
-	private final CommonDao<E, ID> mDao;
+	protected final DAO mDao;
 	
-	public DataAccessResource(CommonDao<E, ID> dao) {
+	public DataAccessResource(DAO dao) {
 		mDao = dao;
 	}
 	
@@ -55,8 +57,16 @@ public abstract class DataAccessResource<E extends DataModelObject<ID>, ID exten
 	@GET
 	@Override
 	public Response get() {
-		List<E> mapAreas = mDao.findAll();
-		return Response.ok(mapAreas).build();
+		List<E> entities = mDao.findAll();
+		return Response.ok(entities).build();
+	}
+	
+	@POST
+	@Path("query")
+	@Override
+	public Response query(DataResourceQuery[] queries) {
+		List<E> entities = mDao.processQueries(queries);
+		return Response.ok(entities).build();
 	}
 
 }

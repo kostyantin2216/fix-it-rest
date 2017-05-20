@@ -15,7 +15,7 @@ import com.fixit.core.data.mongo.SearchTag;
  * @createdAt 	2016/12/16 20:37:15 GMT+2
  */
 @Component
-public class SearchTagResource extends DataAccessResource<SearchTag, ObjectId> {
+public class SearchTagResource extends DataAccessResource<SearchTagDao, SearchTag, ObjectId> {
 
 	public final static String END_POINT = "SearchTags";
 	

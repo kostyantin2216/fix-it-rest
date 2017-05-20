@@ -8,7 +8,7 @@ import com.fixit.core.dao.mongo.UserDao;
 import com.fixit.core.data.mongo.User;
 
 @Component
-public class UserResource extends DataAccessResource<User, ObjectId> {
+public class UserResource extends DataAccessResource<UserDao, User, ObjectId> {
 	
 	public final static String END_POINT = "Users";
 

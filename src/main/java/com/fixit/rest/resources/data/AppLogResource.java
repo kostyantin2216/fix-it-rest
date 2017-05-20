@@ -15,7 +15,7 @@ import com.fixit.core.data.mongo.AppLog;
  * @createdAt 	2016/12/24 16:59:48 GMT+2
  */
 @Component
-public class AppLogResource extends DataAccessResource<AppLog, ObjectId> {
+public class AppLogResource extends DataAccessResource<AppLogDao, AppLog, ObjectId> {
 
 	public final static String END_POINT = "AppLogs";
 	

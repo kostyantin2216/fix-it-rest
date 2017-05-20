@@ -5,9 +5,9 @@
 	<artifactId>fix-it-rest</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
+	<description>One of the view layers for fix-it</description>
   
   	<properties>
-  		<core.version>0.0.1-SNAPSHOT</core.version>
   		<components.version>0.0.1-SNAPSHOT</components.version>
 		<spring.version>4.3.4.RELEASE</spring.version>
 		<servlet.version>2.5</servlet.version>
@@ -15,12 +15,6 @@
 	</properties>
   
   	<dependencies>
-  	
-  		<dependency>
-  			<groupId>com.fix-it</groupId>
-  			<artifactId>fix-it-core</artifactId>
-  			<version>${core.version}</version>
-  		</dependency>
   		
   		<dependency>
   			<groupId>com.fix-it</groupId>

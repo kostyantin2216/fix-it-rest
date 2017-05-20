@@ -15,7 +15,7 @@ import com.fixit.core.data.mongo.AppInstallation;
  * @createdAt 	2016/12/24 22:46:18 GMT+2
  */
 @Component
-public class AppInstallationResource extends DataAccessResource<AppInstallation, ObjectId> {
+public class AppInstallationResource extends DataAccessResource<AppInstallationDao, AppInstallation, ObjectId> {
 
 	public final static String END_POINT = "AppInstallations";
 	

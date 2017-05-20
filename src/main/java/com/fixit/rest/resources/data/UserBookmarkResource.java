@@ -15,7 +15,7 @@ import com.fixit.core.data.mongo.UserBookmark;
  * @createdAt 	2016/12/16 20:35:38 GMT+2
  */
 @Component
-public class UserBookmarkResource extends DataAccessResource<UserBookmark, ObjectId> {
+public class UserBookmarkResource extends DataAccessResource<UserBookmarkDao, UserBookmark, ObjectId> {
 
 	public final static String END_POINT = "UserBookmarks";
 	

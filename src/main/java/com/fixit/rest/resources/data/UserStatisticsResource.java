@@ -7,7 +7,7 @@ import com.fixit.core.dao.sql.UserStatisticsDao;
 import com.fixit.core.data.sql.UserStatistics;
 
 @Component
-public class UserStatisticsResource extends DataAccessResource<UserStatistics, String> {
+public class UserStatisticsResource extends DataAccessResource<UserStatisticsDao, UserStatistics, String> {
 
 	public final static String END_POINT = "UserStatistics";
 	

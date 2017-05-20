@@ -15,7 +15,7 @@ import com.fixit.core.data.sql.StoredProperty.StoredPropertyPK;
  * @createdAt 	2016/12/21 22:36:18 GMT+2
  */
 @Component
-public class StoredPropertyResource extends DataAccessResource<StoredProperty, StoredPropertyPK> {
+public class StoredPropertyResource extends DataAccessResource<StoredPropertyDao, StoredProperty, StoredPropertyPK> {
 
 	public final static String END_POINT = "StoredProperties";
 	

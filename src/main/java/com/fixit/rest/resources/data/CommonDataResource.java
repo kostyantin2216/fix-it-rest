@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.ws.rs.core.Response;
 
+import com.fixit.core.dao.queries.DataResourceQuery;
 import com.fixit.core.data.DataModelObject;
 import com.fixit.rest.resources.RestResource;
 
@@ -13,4 +14,5 @@ public interface CommonDataResource<E extends DataModelObject<ID>, ID extends Se
 	Response delete(ID id);
 	Response get(ID id);
 	Response get();
+	Response query(DataResourceQuery[] queries);
 }
