@@ -40,6 +40,7 @@ public class TradesmenSearchRequestData implements RequestData {
         this.location = location;
     }
     
+    @Override
     public void validate(ServiceResponseHeader respHeader) {
     	if(professionId == null) {
     		respHeader.addError(ServiceError.MISSING_DATA, "cannot search without a professionId");

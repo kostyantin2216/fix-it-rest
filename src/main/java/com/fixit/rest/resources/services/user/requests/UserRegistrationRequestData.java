@@ -106,7 +106,7 @@ public class UserRegistrationRequestData implements RequestData {
 	
 	public User toUser() {
 		return new User(
-				firstName + lastName,
+				firstName + (lastName != null ? " " + lastName : ""),
 				email,
 				telephone,
 				avatarUrl,

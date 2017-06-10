@@ -6,6 +6,9 @@ package com.fixit.rest.resources.services.user;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.fixit.components.registration.users.UserRegistrant;
 import com.fixit.components.registration.users.UserRegistrant.RegistrationResult;
 import com.fixit.rest.resources.services.BaseServiceResource;
@@ -20,12 +23,14 @@ import com.fixit.rest.resources.services.user.responses.UserRegistrationResponse
  * @author 		Kostyantin
  * @createdAt 	2017/05/20 20:50:24 GMT+3
  */
+@Component
 public class UserServiceResource extends BaseServiceResource {
 
 	public final static String END_POINT = "users";
 	
 	private final UserRegistrant mUserRegistrant;
 	
+	@Autowired
 	public UserServiceResource(UserRegistrant userRegistrant) {
 		mUserRegistrant = userRegistrant;
 	}

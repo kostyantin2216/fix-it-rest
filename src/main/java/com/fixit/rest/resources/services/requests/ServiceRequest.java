@@ -1,5 +1,7 @@
 package com.fixit.rest.resources.services.requests;
 
+import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
+
 /**
  * Created by Kostyantin on 3/20/2017.
  */
@@ -24,6 +26,10 @@ public class ServiceRequest<RD extends RequestData> {
 
 	public void setData(RD data) {
 		this.data = data;
+	}
+	
+	public void validate(ServiceResponseHeader respHeader) {
+		data.validate(respHeader);
 	}
 
 	@Override

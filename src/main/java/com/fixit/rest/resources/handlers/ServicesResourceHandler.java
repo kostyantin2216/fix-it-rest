@@ -13,9 +13,11 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.fixit.rest.resources.RestResource;
+import com.fixit.rest.resources.services.data.DataServiceResource;
+import com.fixit.rest.resources.services.orders.OrderServiceResource;
 import com.fixit.rest.resources.services.search.SearchServiceResource;
 import com.fixit.rest.resources.services.synchronization.SynchronizationServiceResource;
-import com.fixit.rest.resources.services.test.TestServiceResource;
+import com.fixit.rest.resources.services.user.UserServiceResource;
 
 /**
  * @author 		Kostyantin
@@ -31,6 +33,16 @@ public class ServicesResourceHandler implements RestResource {
 	
 	@Context
 	private ResourceContext context;
+	
+	@Path(DataServiceResource.END_POINT)
+	public DataServiceResource getDataServiceResource() {
+		return context.getResource(DataServiceResource.class);
+	}
+	
+	@Path(OrderServiceResource.END_POINT)
+	public OrderServiceResource getOrderServiceResource() {
+		return context.getResource(OrderServiceResource.class);
+	}
 
 	@Path(SearchServiceResource.END_POINT)
 	public SearchServiceResource getSearchServiceResource() {
@@ -42,9 +54,9 @@ public class ServicesResourceHandler implements RestResource {
 		return context.getResource(SynchronizationServiceResource.class);
 	}
 	
-	@Path(TestServiceResource.END_POINT)
-	public TestServiceResource getTestServiceResource() {
-		return context.getResource(TestServiceResource.class);
+	@Path(UserServiceResource.END_POINT)
+	public UserServiceResource getUserServiceResource() {
+		return context.getResource(UserServiceResource.class);
 	}
 	
 	@Override

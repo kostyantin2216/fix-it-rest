@@ -51,11 +51,10 @@ public class SearchServiceResource extends BaseServiceResource {
 	@POST
 	@Path("startTradesmanSearch")
 	public ServiceResponse<TradesmenSearchResponseData> startTradesmanSearch(ServiceRequest<TradesmenSearchRequestData> request) {
-		ServiceResponseHeader respHeader = createHeader();
-		TradesmenSearchRequestData reqData = request.getData();
+		ServiceResponseHeader respHeader = createRespHeader(request);
 		
-		reqData.validate(respHeader);
 		if(!respHeader.hasErrors()) {
+			TradesmenSearchRequestData reqData = request.getData();
 			MapAreaDao mapAreaDao = CoreContextProvider.getMapAreaDao();
 			MutableLatLng location = reqData.getLocation();
 			
@@ -80,11 +79,10 @@ public class SearchServiceResource extends BaseServiceResource {
 	@POST
 	@Path("fetchTradesmenResults")
 	public ServiceResponse<TradesmenSearchResultResponseData> fetchTradesmenResults(ServiceRequest<TradesmenSearchResultRequestData> request) {
-		ServiceResponseHeader respHeader = createHeader();
-		TradesmenSearchResultRequestData reqData = request.getData();
+		ServiceResponseHeader respHeader = createRespHeader(request);
 		
-		reqData.validate(respHeader);
 		if(!respHeader.hasErrors()) {
+			TradesmenSearchResultRequestData reqData = request.getData();
 			SearchResult searchResult = mSearchExecutor.getResult(reqData.getSearchKey());
 			
 			TradesmenSearchResultResponseData respData = new TradesmenSearchResultResponseData();

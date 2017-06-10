@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 import com.fixit.rest.resources.RestResource;
 import com.fixit.rest.resources.data.AppInstallationResource;
 import com.fixit.rest.resources.data.AppLogResource;
-import com.fixit.rest.resources.data.JobResource;
+import com.fixit.rest.resources.data.JobReasonResource;
+import com.fixit.rest.resources.data.OrderResource;
 import com.fixit.rest.resources.data.MapAreaResource;
 import com.fixit.rest.resources.data.ProfessionResource;
 import com.fixit.rest.resources.data.ReviewResource;
@@ -45,9 +46,14 @@ public class DataResourceHandler implements RestResource {
 		return context.getResource(AppLogResource.class);
 	}
 	
-	@Path(JobResource.END_POINT)
-	public JobResource getJobResource() {
-		return context.getResource(JobResource.class);
+	@Path(JobReasonResource.END_POINT)
+	public JobReasonResource getJobReasonResource() {
+		return context.getResource(JobReasonResource.class);
+	}
+	
+	@Path(OrderResource.END_POINT)
+	public OrderResource getJobResource() {
+		return context.getResource(OrderResource.class);
 	}
 	
 	@Path(MapAreaResource.END_POINT)

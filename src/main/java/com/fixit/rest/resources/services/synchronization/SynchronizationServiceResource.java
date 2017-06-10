@@ -34,27 +34,21 @@ public class SynchronizationServiceResource extends BaseServiceResource {
 	@POST
 	@SuppressWarnings("rawtypes")
 	public ServiceResponse<SynchronizationResponseData> synchronize(ServiceRequest<SynchronizationRequestData> request) {
-		ServiceResponseHeader respHeader = createHeader();
-		if(request != null) {
+		ServiceResponseHeader respHeader = createRespHeader(request);
+
+		if(!respHeader.hasErrors()) {
 			SynchronizationRequestData reqData = request.getData();
-			
-			if(reqData != null) {
-				reqData.validate(respHeader);
-				if(!respHeader.hasErrors()) {
-					SynchronizationParamsDao synchronizationParamsDao = CoreContextProvider.getSynchronizationParamsDao();
-					SynchronizationTask synchronizationTask = new SynchronizationTask(synchronizationParamsDao, reqData.getLastSynchronization());
-					TaskResult<List<SynchronizationResult>> result = synchronizationTask.process(reqData.getSynchronizationHistory());
-				
-					if(result.isCriticalError()) {
-						respHeader.addError(ServiceError.UNKNOWN, "Could not synchronize due to: " + result.getFirstError().getMsg());
-					} else {
-						return new ServiceResponse<SynchronizationResponseData>(respHeader, new SynchronizationResponseData(result.getResult()));
-					}
-				}
+			SynchronizationParamsDao synchronizationParamsDao = CoreContextProvider.getSynchronizationParamsDao();
+			SynchronizationTask synchronizationTask = new SynchronizationTask(synchronizationParamsDao, reqData.getLastSynchronization());
+			TaskResult<List<SynchronizationResult>> result = synchronizationTask.process(reqData.getSynchronizationHistory());
+
+			if(result.isCriticalError()) {
+				respHeader.addError(ServiceError.UNKNOWN, "Could not synchronize due to: " + result.getFirstError().getMsg());
 			} else {
-				respHeader.addError(ServiceError.MISSING_DATA, "cannot proceed without data");
+				return new ServiceResponse<SynchronizationResponseData>(respHeader, new SynchronizationResponseData(result.getResult()));
 			}
 		}
+
 		return new ServiceResponse<SynchronizationResponseData>(respHeader, null);
 	}
 
