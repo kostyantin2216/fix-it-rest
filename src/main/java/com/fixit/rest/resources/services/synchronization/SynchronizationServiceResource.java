@@ -7,11 +7,12 @@ import java.util.List;
 
 import javax.ws.rs.POST;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.fixit.components.synchronization.SynchronizationResult;
 import com.fixit.components.synchronization.SynchronizationTask;
-import com.fixit.core.config.CoreContextProvider;
 import com.fixit.core.dao.mongo.SynchronizationParamsDao;
 import com.fixit.core.tasks.TaskResult;
 import com.fixit.rest.resources.services.BaseServiceResource;
@@ -31,6 +32,12 @@ public class SynchronizationServiceResource extends BaseServiceResource {
 	
 	public final static String END_POINT = "synchronization";
 	
+	@Autowired
+	private ApplicationContext applicationContext;
+	
+	@Autowired
+	private SynchronizationParamsDao synchronizationParamsDao;
+	
 	@POST
 	@SuppressWarnings("rawtypes")
 	public ServiceResponse<SynchronizationResponseData> synchronize(ServiceRequest<SynchronizationRequestData> request) {
@@ -38,8 +45,7 @@ public class SynchronizationServiceResource extends BaseServiceResource {
 
 		if(!respHeader.hasErrors()) {
 			SynchronizationRequestData reqData = request.getData();
-			SynchronizationParamsDao synchronizationParamsDao = CoreContextProvider.getSynchronizationParamsDao();
-			SynchronizationTask synchronizationTask = new SynchronizationTask(synchronizationParamsDao, reqData.getLastSynchronization());
+			SynchronizationTask synchronizationTask = new SynchronizationTask(applicationContext, synchronizationParamsDao, reqData.getLastSynchronization());
 			TaskResult<List<SynchronizationResult>> result = synchronizationTask.process(reqData.getSynchronizationHistory());
 
 			if(result.isCriticalError()) {

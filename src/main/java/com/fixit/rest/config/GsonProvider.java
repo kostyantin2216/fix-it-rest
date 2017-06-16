@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -19,25 +20,29 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import com.fixit.core.config.CoreContextProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.fixit.core.config.GsonManager;
 import com.google.gson.Gson;
 
 @Provider
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
-    private final Gson gson;
-
     @Context
     private UriInfo ui;
     
-    public GsonProvider() {
-        GsonManager gsonManager = CoreContextProvider.getGsonManager();
-
-        this.gson = gsonManager.getRestResourceGsonBuilder()
-        		.create();
+    @Autowired 
+    private GsonManager gsonManager;
+    
+    private Gson gson;	
+    
+    @PostConstruct
+    public void init() {
+    	gson = gsonManager.getRestResourceGsonBuilder().create();
     }
 
     @Override

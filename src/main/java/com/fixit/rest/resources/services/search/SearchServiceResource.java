@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import com.fixit.components.search.SearchExecutor;
 import com.fixit.components.search.SearchParams;
 import com.fixit.components.search.SearchResult;
-import com.fixit.core.config.CoreContextProvider;
 import com.fixit.core.dao.mongo.MapAreaDao;
 import com.fixit.core.dao.sql.ReviewDao;
 import com.fixit.core.data.MapAreaType;
@@ -42,10 +41,15 @@ public class SearchServiceResource extends BaseServiceResource {
 	public final static String END_POINT = "search";
 	
 	private final SearchExecutor mSearchExecutor;
+
+	private final MapAreaDao mMapAreaDao;
+	private final ReviewDao mReviewDao;
 	
 	@Autowired
-	public SearchServiceResource(SearchExecutor searchExecutor) {
-		this.mSearchExecutor = searchExecutor;
+	public SearchServiceResource(SearchExecutor searchExecutor, MapAreaDao mapAreaDao, ReviewDao reviewDao) {
+		mSearchExecutor = searchExecutor;
+		mMapAreaDao = mapAreaDao;
+		mReviewDao = reviewDao;
 	}
 	
 	@POST
@@ -55,10 +59,9 @@ public class SearchServiceResource extends BaseServiceResource {
 		
 		if(!respHeader.hasErrors()) {
 			TradesmenSearchRequestData reqData = request.getData();
-			MapAreaDao mapAreaDao = CoreContextProvider.getMapAreaDao();
 			MutableLatLng location = reqData.getLocation();
 			
-			MapArea mapArea = mapAreaDao.getMapAreaAtLocationForType(
+			MapArea mapArea = mMapAreaDao.getMapAreaAtLocationForType(
 					location.getLng(), 
 					location.getLat(), 
 					MapAreaType.Ward
@@ -92,11 +95,10 @@ public class SearchServiceResource extends BaseServiceResource {
 					if(!searchResult.tradesmen.isEmpty()) {
 						respData.setTradesmen(searchResult.tradesmen);
 						
-						ReviewDao reviewDao = CoreContextProvider.getReviewDao();
 						Map<String, Long> reviewsForTradesman = new HashMap<>();
 						for(Tradesman tradesman : searchResult.tradesmen) {
 							String tradesmanId = tradesman.get_id().toString();
-							reviewsForTradesman.put(tradesmanId, reviewDao.getCountForTradesman(tradesmanId));
+							reviewsForTradesman.put(tradesmanId, mReviewDao.getCountForTradesman(tradesmanId));
 						}
 						respData.setReviewCountForTradesmen(reviewsForTradesman);
 					}
