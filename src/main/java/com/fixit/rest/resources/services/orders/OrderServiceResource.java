@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fixit.components.orders.TradesmanOrderController;
+import com.fixit.core.dao.mongo.TradesmanDao;
 import com.fixit.core.dao.mongo.UserDao;
 import com.fixit.core.data.mongo.User;
 import com.fixit.rest.resources.services.BaseServiceResource;

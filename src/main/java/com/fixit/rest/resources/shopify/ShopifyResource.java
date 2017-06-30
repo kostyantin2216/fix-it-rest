@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fixit.components.registration.tradesmen.TradesmanRegistrant;
+import com.fixit.core.data.shopify.ShopifyCustomer;
 import com.fixit.core.data.shopify.ShopifyOrder;
 import com.fixit.core.logging.FILog;
 import com.fixit.rest.resources.RestResource;
@@ -38,6 +39,18 @@ public class ShopifyResource implements RestResource {
 	public Response onOrderCreated(ShopifyOrder order) {
 		try {
 			tradesmanRegistrant.newRegistration(order.getCustomer());
+		} catch(Exception e) {
+			FILog.e(LOG_TAG, "Error while creating new tradesman account.", e);
+		}
+		
+		return Response.ok().build();
+	}
+	
+	@POST
+	@Path("onCustomerCreated")
+	public Response onCustomerCreated(ShopifyCustomer customer) {
+		try {
+			tradesmanRegistrant.newRegistration(customer);
 		} catch(Exception e) {
 			FILog.e(LOG_TAG, "Error while creating new tradesman account.", e);
 		}

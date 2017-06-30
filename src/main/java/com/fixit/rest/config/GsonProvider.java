@@ -24,6 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fixit.core.config.GsonManager;
+import com.fixit.core.dao.mongo.TradesmanDao;
+import com.fixit.core.dao.mongo.impl.TradesmanDaoImpl;
+import com.fixit.core.data.mongo.Tradesman;
+import com.fixit.rest.deserialization.FieldExclusionStrategyManager;
 import com.google.gson.Gson;
 
 @Provider
@@ -42,7 +46,17 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
     
     @PostConstruct
     public void init() {
-    	gson = gsonManager.getRestResourceGsonBuilder().create();
+    	gson = gsonManager.getRestResourceGsonBuilder().addSerializationExclusionStrategy(
+    				new FieldExclusionStrategyManager.Builder()
+    					.add(Tradesman.class, 
+    							TradesmanDao.PROP_PASSWORD, 
+    							TradesmanDao.PROP_EMAIL,
+    							TradesmanDao.PROP_TELEPHONE,	
+    							TradesmanDao.PROP_SUBSCRIPTION_EXPIRY_TIME,
+    							TradesmanDao.PROP_LEAD_ID,
+    							TradesmanDao.PROP_WORKING_AREAS)
+    					.build()
+    			).create();
     }
 
     @Override
@@ -55,7 +69,6 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
     public T readFrom(Class<T> type, Type genericType, Annotation[] annotations,
                       MediaType mediaType, MultivaluedMap<String, String> httpHeaders,
                       InputStream entityStream) throws IOException, WebApplicationException {
-
         InputStreamReader reader = new InputStreamReader(entityStream, "UTF-8");
         try {
             return gson.fromJson(reader, genericType);
