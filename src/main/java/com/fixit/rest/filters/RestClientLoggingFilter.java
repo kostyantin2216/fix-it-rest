@@ -23,7 +23,7 @@ public class RestClientLoggingFilter extends LoggingFilter {
 	
 	@Override
 	protected boolean isDebugLogEnabled() {
-		return true;
+		return false;
 	}
 	
 	@Override

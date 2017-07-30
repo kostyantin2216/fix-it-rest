@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.fix-it</groupId>
 	<artifactId>fix-it-rest</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>war</packaging>
 	<description>One of the view layers for fix-it</description>
   
   	<properties>
-  		<components.version>0.0.1-SNAPSHOT</components.version>
+  		<components.version>0.0.1</components.version>
 		<spring.version>4.3.4.RELEASE</spring.version>
 		<servlet.version>2.5</servlet.version>
 		<jersey.version>2.25.1</jersey.version>

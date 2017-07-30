@@ -3,17 +3,14 @@
  */
 package com.fixit.rest.resources.handlers;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 
 import org.springframework.stereotype.Component;
 
 import com.fixit.rest.resources.RestResource;
-import com.fixit.rest.resources.shopify.ShopifyResource;
+import com.fixit.rest.resources.general.TradesmanLeadHookResource;
 
 /**
  * @author 		Kostyantin
@@ -28,11 +25,9 @@ public class GeneralResourceHandler implements RestResource {
 	@Context
 	private ResourceContext context;
 	
-	@Path(ShopifyResource.END_POINT)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public ShopifyResource getShopifyResource() {
-		return context.getResource(ShopifyResource.class);
+	@Path(TradesmanLeadHookResource.END_POINT)
+	public TradesmanLeadHookResource getTradesmanLeadHookResource() {
+		return context.getResource(TradesmanLeadHookResource.class);
 	}
 	
 	@Override
