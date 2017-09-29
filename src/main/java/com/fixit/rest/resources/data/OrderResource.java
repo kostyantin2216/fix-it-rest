@@ -4,17 +4,17 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fixit.core.dao.mongo.OrderDao;
-import com.fixit.core.data.mongo.Order;
+import com.fixit.core.dao.mongo.OrderDataDao;
+import com.fixit.core.data.mongo.OrderData;
 
 @Component
-public class OrderResource extends DataAccessResource<OrderDao, Order, ObjectId> {
+public class OrderResource extends DataAccessResource<OrderDataDao, OrderData, ObjectId> {
 
 	public final static String END_POINT = "Orders";
 	
 	@Autowired
-	public OrderResource(OrderDao dao) {
-		super(dao);
+	public OrderResource(OrderDataDao orderDataDao) {
+		super(orderDataDao);
 	}
 
 	@Override

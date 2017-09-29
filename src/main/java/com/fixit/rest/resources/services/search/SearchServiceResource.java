@@ -3,8 +3,7 @@
  */
 package com.fixit.rest.resources.services.search;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,15 +11,8 @@ import javax.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fixit.components.search.SearchExecutor;
-import com.fixit.components.search.SearchParams;
+import com.fixit.components.search.SearchController;
 import com.fixit.components.search.SearchResult;
-import com.fixit.core.dao.mongo.MapAreaDao;
-import com.fixit.core.dao.sql.ReviewDao;
-import com.fixit.core.data.MapAreaType;
-import com.fixit.core.data.MutableLatLng;
-import com.fixit.core.data.mongo.MapArea;
-import com.fixit.core.data.mongo.Tradesman;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.requests.ServiceRequest;
@@ -40,16 +32,11 @@ public class SearchServiceResource extends BaseServiceResource {
 
 	public final static String END_POINT = "search";
 	
-	private final SearchExecutor mSearchExecutor;
-
-	private final MapAreaDao mMapAreaDao;
-	private final ReviewDao mReviewDao;
+	private final SearchController mSearchController;
 	
 	@Autowired
-	public SearchServiceResource(SearchExecutor searchExecutor, MapAreaDao mapAreaDao, ReviewDao reviewDao) {
-		mSearchExecutor = searchExecutor;
-		mMapAreaDao = mapAreaDao;
-		mReviewDao = reviewDao;
+	public SearchServiceResource(SearchController searchController) {
+		mSearchController = searchController;
 	}
 	
 	@POST
@@ -59,18 +46,10 @@ public class SearchServiceResource extends BaseServiceResource {
 		
 		if(!respHeader.hasErrors()) {
 			TradesmenSearchRequestData reqData = request.getData();
-			MutableLatLng location = reqData.getLocation();
 			
-			MapArea mapArea = mMapAreaDao.getMapAreaAtLocationForType(
-					location.getLng(), 
-					location.getLat(), 
-					MapAreaType.Ward
-			);
-			if(mapArea != null) {
-				SearchParams searchParams = new SearchParams(reqData.getProfessionId(), mapArea);
-				String searchId = mSearchExecutor.createSearch(searchParams);
-				
-				return new ServiceResponse<TradesmenSearchResponseData>(respHeader, new TradesmenSearchResponseData(searchId));
+			Optional<String> searchId = mSearchController.createSearch(reqData.getProfessionId(), reqData.getLocation());
+			if(searchId.isPresent()) {
+				return new ServiceResponse<TradesmenSearchResponseData>(respHeader, new TradesmenSearchResponseData(searchId.get()));
 			} else {
 				respHeader.addError(ServiceError.UNSUPPORTED, "location unsupported");
 			}
@@ -86,7 +65,7 @@ public class SearchServiceResource extends BaseServiceResource {
 		
 		if(!respHeader.hasErrors()) {
 			TradesmenSearchResultRequestData reqData = request.getData();
-			SearchResult searchResult = mSearchExecutor.getResult(reqData.getSearchKey());
+			SearchResult searchResult = mSearchController.getSearchResult(reqData.getSearchKey());
 			
 			TradesmenSearchResultResponseData respData = new TradesmenSearchResultResponseData();
 			if(searchResult.isComplete) {
@@ -94,13 +73,7 @@ public class SearchServiceResource extends BaseServiceResource {
 				if(searchResult.errors.isEmpty()) {
 					if(!searchResult.tradesmen.isEmpty()) {
 						respData.setTradesmen(searchResult.tradesmen);
-						
-						Map<String, Long> reviewsForTradesman = new HashMap<>();
-						for(Tradesman tradesman : searchResult.tradesmen) {
-							String tradesmanId = tradesman.get_id().toString();
-							reviewsForTradesman.put(tradesmanId, mReviewDao.getCountForTradesman(tradesmanId));
-						}
-						respData.setReviewCountForTradesmen(reviewsForTradesman);
+						respData.setReviewCountForTradesmen(searchResult.reviewCountForTradesmen);
 					}
 				} else {
 					respHeader.addError(ServiceError.UNKNOWN, searchResult.errorToString());

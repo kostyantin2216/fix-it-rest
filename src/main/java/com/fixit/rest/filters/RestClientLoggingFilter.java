@@ -23,12 +23,12 @@ public class RestClientLoggingFilter extends LoggingFilter {
 	
 	@Override
 	protected boolean isDebugLogEnabled() {
-		return false;
+		return true;
 	}
 	
 	@Override
 	public void log(String logMsg) {
-		FILog.i(logMsg);
+		FILog.i(LOG_TAG, logMsg);
 	}
 	
 	@Override

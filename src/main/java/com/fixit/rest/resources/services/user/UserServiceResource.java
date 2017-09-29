@@ -3,14 +3,18 @@
  */
 package com.fixit.rest.resources.services.user;
 
+import java.util.List;
+
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fixit.components.registration.users.UserRegistrant;
-import com.fixit.components.registration.users.UserRegistrant.RegistrationResult;
+import com.fixit.components.orders.OrderController;
+import com.fixit.components.registration.UserRegistrationController;
+import com.fixit.components.registration.UserRegistrationController.RegistrationResult;
+import com.fixit.core.data.mongo.OrderData;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.requests.ServiceRequest;
@@ -28,11 +32,13 @@ public class UserServiceResource extends BaseServiceResource {
 
 	public final static String END_POINT = "users";
 	
-	private final UserRegistrant mUserRegistrant;
+	private final UserRegistrationController mUserRegistrationController;
+	private final OrderController mOrderController;
 	
 	@Autowired
-	public UserServiceResource(UserRegistrant userRegistrant) {
-		mUserRegistrant = userRegistrant;
+	public UserServiceResource(UserRegistrationController userRegistrationController, OrderController orderController) {
+		mUserRegistrationController = userRegistrationController;
+		mOrderController = orderController; 
 	}
 	
 	@POST
@@ -41,7 +47,7 @@ public class UserServiceResource extends BaseServiceResource {
 		ServiceResponseHeader respHeader = createRespHeader(request);
 		
 		if(!respHeader.hasErrors()) {
-			RegistrationResult result = mUserRegistrant.findOrRegister(
+			RegistrationResult result = mUserRegistrationController.findOrRegister(
 					request.getData().toUser(), 
 					request.getHeader().getInstallationId()
 			);
@@ -49,8 +55,12 @@ public class UserServiceResource extends BaseServiceResource {
 			if(result.invalidAppInstallationId) {
 				respHeader.addError(ServiceError.INVALID_DATA, "Invalid installationId");
 			} else {
+				List<OrderData> orderHistory = null;
+				if(!result.newUser) {
+					orderHistory = mOrderController.getUserOrderHistory(result.user.get_id());
+				}
 				return new ServiceResponse<UserRegistrationResponseData>(respHeader, 
-						new UserRegistrationResponseData(result.emailExists, result.user.get_id())
+						new UserRegistrationResponseData(result.emailExists, result.newUser, result.user.get_id(), orderHistory)
 				);
 			}
 		}

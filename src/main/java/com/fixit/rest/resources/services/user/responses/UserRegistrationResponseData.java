@@ -3,8 +3,11 @@
  */
 package com.fixit.rest.resources.services.user.responses;
 
+import java.util.List;
+
 import org.bson.types.ObjectId;
 
+import com.fixit.core.data.mongo.OrderData;
 import com.fixit.rest.resources.services.responses.ResponseData;
 
 /**
@@ -13,11 +16,15 @@ import com.fixit.rest.resources.services.responses.ResponseData;
  */
 public class UserRegistrationResponseData implements ResponseData {
 	private boolean existingEmail;
+	private boolean newUser;
     private ObjectId userId;
+    private List<OrderData> orderHistory;
 
-    public UserRegistrationResponseData(boolean existingEmail, ObjectId userId) {
+    public UserRegistrationResponseData(boolean existingEmail, boolean newUser, ObjectId userId, List<OrderData> orderHistory) {
 		this.existingEmail = existingEmail;
+		this.newUser = newUser;
 		this.userId = userId;
+		this.orderHistory = orderHistory;
 	}
 
 	public boolean isExistingEmail() {
@@ -26,21 +33,36 @@ public class UserRegistrationResponseData implements ResponseData {
 
     public void setExistingEmail(boolean existingEmail) {
         this.existingEmail = existingEmail;
-    }
+    }    
 
-    public ObjectId getUserId() {
+    public boolean isNewUser() {
+		return newUser;
+	}
+
+	public void setNewUser(boolean newUser) {
+		this.newUser = newUser;
+	}
+
+	public ObjectId getUserId() {
         return userId;
     }
 
     public void setUserId(ObjectId userId) {
         this.userId = userId;
     }
+    
+    public List<OrderData> getOrderHistory() {
+		return orderHistory;
+	}
 
-    @Override
-    public String toString() {
-        return "UserRegistrationResponseData{" +
-                "existingEmail=" + existingEmail +
-                ", userId='" + userId + '\'' +
-                '}';
-    }
+	public void setOrderHistory(List<OrderData> orderHistory) {
+		this.orderHistory = orderHistory;
+	}
+
+	@Override
+	public String toString() {
+		return "UserRegistrationResponseData [existingEmail=" + existingEmail + ", newUser=" + newUser + ", userId="
+				+ userId + ", orderHistory=" + orderHistory + "]";
+	}
+
 }

@@ -10,10 +10,13 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fixit.components.orders.TradesmanOrderController;
-import com.fixit.core.dao.mongo.TradesmanDao;
+import com.fixit.components.orders.OrderController;
 import com.fixit.core.dao.mongo.UserDao;
+import com.fixit.core.dao.sql.ProfessionDao;
+import com.fixit.core.data.mongo.OrderData;
 import com.fixit.core.data.mongo.User;
+import com.fixit.core.data.sql.JobReason;
+import com.fixit.core.data.sql.Profession;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.orders.requests.TradesmenOrderRequestData;
@@ -32,10 +35,12 @@ public class OrderServiceResource extends BaseServiceResource {
 	public final static String END_POINT = "orders";
 	
 	private final UserDao mUserDao;
-	private final TradesmanOrderController mOrderController;
+	private final ProfessionDao mProfessionDao;
+	private final OrderController mOrderController;
 	
 	@Autowired
-	public OrderServiceResource(UserDao userDao, TradesmanOrderController orderController) {
+	public OrderServiceResource(ProfessionDao professionDao, UserDao userDao, OrderController orderController) {
+		mProfessionDao = professionDao;
 		mUserDao = userDao;
 		mOrderController = orderController;
 	}
@@ -49,19 +54,30 @@ public class OrderServiceResource extends BaseServiceResource {
 			TradesmenOrderRequestData reqData = request.getData();
 			TradesmenOrderResponseData respData = new TradesmenOrderResponseData();
 			
-			User user = mUserDao.findById(new ObjectId(request.getHeader().getUserId()));
-			if(user != null) {
-				mOrderController.orderTradesmen(
-						user, 
-						reqData.getTradesmen(), 
-						reqData.getJobLocation(), 
-						reqData.getReason()
-				);
-				respData.setComplete(true);
-				return new ServiceResponse<TradesmenOrderResponseData>(respHeader, respData);
+			Profession profession = mProfessionDao.findById(reqData.getProfessionId());
+			String userId = request.getHeader().getUserId();
+			if(profession == null) {
+				respHeader.addError(ServiceError.INVALID_DATA, "Invalid profession, profession with id " + reqData.getProfessionId() + " does not exist");
+			} else if(profession.getIsActive()) {
+				User user = mUserDao.findById(new ObjectId(userId));
+				if(user != null) {
+					JobReason[] jobReasons = reqData.getJobReasons();
+					OrderData orderData = mOrderController.orderTradesmen(
+							reqData.getProfessionId(),
+							user, 
+							reqData.getTradesmen(), 
+							reqData.getJobLocation(), 
+							jobReasons != null ? jobReasons : new JobReason[0],
+							reqData.getComment()
+					);
+					respData.setOrderData(orderData);
+					return new ServiceResponse<TradesmenOrderResponseData>(respHeader, respData);
+				} else {
+					respHeader.addError(ServiceError.INVALID_DATA, "Invalid userId, user with id " + userId + " does not exist");
+				}
 			} else {
-				respHeader.addError(ServiceError.INVALID_DATA, "Invalid userId, user does not exist");
-			}			
+				respHeader.addError(ServiceError.INVALID_DATA, "Invalid profession, " + profession.getName() + " is disabled");
+			}
 		}
 		
 		return new ServiceResponse<TradesmenOrderResponseData>(respHeader, null);

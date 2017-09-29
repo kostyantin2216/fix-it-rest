@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import com.fixit.core.data.JobLocation;
 import com.fixit.core.data.mongo.Tradesman;
+import com.fixit.core.data.sql.JobReason;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.requests.RequestData;
 import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
@@ -18,8 +19,10 @@ import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
 public class TradesmenOrderRequestData implements RequestData {
 
 	private JobLocation jobLocation;
+	private int professionId;
 	private Tradesman[] tradesmen;
-	private String reason;
+	private JobReason[] jobReasons;
+	private String comment;
 	
 	public JobLocation getJobLocation() {
 		return jobLocation;
@@ -33,32 +36,53 @@ public class TradesmenOrderRequestData implements RequestData {
 		return tradesmen;
 	}
 
+	public int getProfessionId() {
+		return professionId;
+	}
+
+	public void setProfessionId(int professionId) {
+		this.professionId = professionId;
+	}
+
 	public void setTradesmen(Tradesman[] tradesmen) {
 		this.tradesmen = tradesmen;
 	}
-
-	public String getReason() {
-		return reason;
+	
+	public JobReason[] getJobReasons() {
+		return jobReasons;
 	}
 
-	public void setReason(String reason) {
-		this.reason = reason;
+	public void setJobReasons(JobReason[] jobReasons) {
+		this.jobReasons = jobReasons;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	@Override
 	public void validate(ServiceResponseHeader respHeader) {
+		if(professionId == 0) {
+			respHeader.addError(ServiceError.MISSING_DATA, "Missing professionId");
+		} else if(professionId < 0) {
+			respHeader.addError(ServiceError.INVALID_DATA, "Invalid professionId");
+		}
 		if(tradesmen == null || tradesmen.length == 0) {
-			respHeader.addError(ServiceError.MISSING_DATA, "Cannot order tradesmen without any tradesmen");
+			respHeader.addError(ServiceError.MISSING_DATA, "Missing tradesmen");
 		}
 		if(jobLocation == null) {
-			respHeader.addError(ServiceError.MISSING_DATA, "Cannot order tradesmen without a location");
+			respHeader.addError(ServiceError.MISSING_DATA, "Missing jobLocation");
 		}
 	}
 
 	@Override
 	public String toString() {
 		return "TradesmenOrderRequestData [jobLocation=" + jobLocation + ", tradesmen=" + Arrays.toString(tradesmen)
-				+ ", reason=" + reason + "]";
+				+ ", reason=" + comment + "]";
 	}
 	
 }

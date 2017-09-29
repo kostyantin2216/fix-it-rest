@@ -11,8 +11,8 @@ import com.fixit.rest.resources.RestResource;
 public interface CommonDataResource<E extends DataModelObject<ID>, ID extends Serializable> extends RestResource {
 	Response create(E entity);
 	Response update(E entity);
-	Response delete(ID id);
-	Response get(ID id);
+	Response delete(String id);
+	Response get(String id);
 	Response get();
 	Response query(DataResourceQuery[] queries);
 }

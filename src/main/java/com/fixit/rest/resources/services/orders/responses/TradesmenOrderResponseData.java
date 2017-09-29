@@ -3,6 +3,7 @@
  */
 package com.fixit.rest.resources.services.orders.responses;
 
+import com.fixit.core.data.mongo.OrderData;
 import com.fixit.rest.resources.services.responses.ResponseData;
 
 /**
@@ -11,19 +12,19 @@ import com.fixit.rest.resources.services.responses.ResponseData;
  */
 public class TradesmenOrderResponseData implements ResponseData {
 
-	private boolean complete;
-
-	public boolean isComplete() {
-		return complete;
+	private OrderData orderData;
+	
+	public OrderData getOrderData() {
+		return orderData;
 	}
 
-	public void setComplete(boolean complete) {
-		this.complete = complete;
+	public void setOrderData(OrderData orderData) {
+		this.orderData = orderData;
 	}
 
 	@Override
 	public String toString() {
-		return "TradesmenOrderResponseData [complete=" + complete + "]";
+		return "TradesmenOrderResponseData [orderData=" + orderData + "]";
 	}
 	
 }

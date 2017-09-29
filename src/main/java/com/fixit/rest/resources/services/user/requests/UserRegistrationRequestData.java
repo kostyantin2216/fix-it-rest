@@ -3,6 +3,8 @@
  */
 package com.fixit.rest.resources.services.user.requests;
 
+import java.util.Date;
+
 import org.springframework.util.StringUtils;
 
 import com.fixit.core.data.mongo.User;
@@ -106,12 +108,13 @@ public class UserRegistrationRequestData implements RequestData {
 	
 	public User toUser() {
 		return new User(
-				firstName + (lastName != null ? " " + lastName : ""),
+				firstName + (lastName != null ? !lastName.equals("null") ? " " + lastName : "" : ""),
 				email,
 				telephone,
 				avatarUrl,
 				facebookId,
-				googleId
+				googleId,
+				new Date()
 		);
 	}
 

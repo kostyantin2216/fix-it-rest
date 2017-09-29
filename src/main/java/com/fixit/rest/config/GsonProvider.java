@@ -24,8 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fixit.core.config.GsonManager;
+import com.fixit.core.dao.mongo.OrderDataDao;
 import com.fixit.core.dao.mongo.TradesmanDao;
-import com.fixit.core.dao.mongo.impl.TradesmanDaoImpl;
+import com.fixit.core.data.mongo.OrderData;
 import com.fixit.core.data.mongo.Tradesman;
 import com.fixit.rest.deserialization.FieldExclusionStrategyManager;
 import com.google.gson.Gson;
@@ -50,11 +51,11 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
     				new FieldExclusionStrategyManager.Builder()
     					.add(Tradesman.class, 
     							TradesmanDao.PROP_PASSWORD, 
-    							TradesmanDao.PROP_EMAIL,
-    							TradesmanDao.PROP_TELEPHONE,	
     							TradesmanDao.PROP_SUBSCRIPTION_EXPIRY_TIME,
     							TradesmanDao.PROP_LEAD_ID,
     							TradesmanDao.PROP_WORKING_AREAS)
+    					.add(OrderData.class, 
+    							OrderDataDao.PROP_USER_ID)
     					.build()
     			).create();
     }

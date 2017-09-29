@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import com.fixit.core.dao.mongo.MapAreaDao;
 import com.fixit.core.data.MapAreaType;
 import com.fixit.core.data.mongo.MapArea;
-import com.fixit.core.utils.CommonUtils;
+import com.fixit.core.utils.Formatter;
 
 @Component
 public class MapAreaResource extends DataAccessResource<MapAreaDao, MapArea, ObjectId> {
@@ -24,7 +24,7 @@ public class MapAreaResource extends DataAccessResource<MapAreaDao, MapArea, Obj
 	@GET
 	@Path("ofType/{type}")
 	public List<MapArea> getAreasForType(@PathParam("type") String type) {
-		MapAreaType enumType = MapAreaType.valueOf(CommonUtils.capitalizeSentence(type));
+		MapAreaType enumType = MapAreaType.valueOf(Formatter.capitalizeSentence(type));
 		
 		if(enumType == null) {
 			throw new IllegalArgumentException("Invalid path param: type");
@@ -36,7 +36,7 @@ public class MapAreaResource extends DataAccessResource<MapAreaDao, MapArea, Obj
 	@GET
 	@Path("parentsForType/{type}")
 	public List<MapArea> getParentAreasForType(@PathParam("type") String type) {
-		MapAreaType enumType = MapAreaType.valueOf(CommonUtils.capitalizeSentence(type));
+		MapAreaType enumType = MapAreaType.valueOf(Formatter.capitalizeSentence(type));
 		
 		if(enumType == null) {
 			throw new IllegalArgumentException("Invalid path param: type");
