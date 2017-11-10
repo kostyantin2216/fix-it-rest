@@ -3,8 +3,6 @@
  */
 package com.fixit.rest.resources.services.search;
 
-import java.util.Optional;
-
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
@@ -13,6 +11,12 @@ import org.springframework.stereotype.Component;
 
 import com.fixit.components.search.SearchController;
 import com.fixit.components.search.SearchResult;
+import com.fixit.core.dao.mongo.MapAreaDao;
+import com.fixit.core.dao.sql.ProfessionDao;
+import com.fixit.core.data.MapAreaType;
+import com.fixit.core.data.MutableLatLng;
+import com.fixit.core.data.mongo.MapArea;
+import com.fixit.core.data.sql.Profession;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
 import com.fixit.rest.resources.services.requests.ServiceRequest;
@@ -33,10 +37,14 @@ public class SearchServiceResource extends BaseServiceResource {
 	public final static String END_POINT = "search";
 	
 	private final SearchController mSearchController;
+	private final ProfessionDao mProfessionDao;
+	private final MapAreaDao mMapAreaDao;
 	
 	@Autowired
-	public SearchServiceResource(SearchController searchController) {
+	public SearchServiceResource(SearchController searchController, ProfessionDao professionDao, MapAreaDao mapAreaDao) {
 		mSearchController = searchController;
+		mProfessionDao = professionDao;
+		mMapAreaDao = mapAreaDao;
 	}
 	
 	@POST
@@ -47,11 +55,28 @@ public class SearchServiceResource extends BaseServiceResource {
 		if(!respHeader.hasErrors()) {
 			TradesmenSearchRequestData reqData = request.getData();
 			
-			Optional<String> searchId = mSearchController.createSearch(reqData.getProfessionId(), reqData.getLocation());
-			if(searchId.isPresent()) {
-				return new ServiceResponse<TradesmenSearchResponseData>(respHeader, new TradesmenSearchResponseData(searchId.get()));
+			Profession profession = mProfessionDao.findById(reqData.getProfessionId());
+			
+			if(profession != null) {
+				if(profession.getIsActive()) {
+					MutableLatLng location = reqData.getLocation();
+					MapArea mapArea = mMapAreaDao.getMapAreaAtLocationForType(
+							location.getLng(), 
+							location.getLat(), 
+							MapAreaType.Ward
+					);
+					
+					if(mapArea != null) {
+						String searchId = mSearchController.createSearch(profession, mapArea);
+						return new ServiceResponse<TradesmenSearchResponseData>(respHeader, new TradesmenSearchResponseData(searchId));
+					} else {
+						respHeader.addError(ServiceError.UNSUPPORTED, "location unsupported");
+					}
+				} else {
+					respHeader.addError(ServiceError.UNSUPPORTED, "profession is currently unsupported");
+				}
 			} else {
-				respHeader.addError(ServiceError.UNSUPPORTED, "location unsupported");
+				respHeader.addError(ServiceError.INVALID_DATA, "invalid profession id");
 			}
 		}
 		
@@ -68,7 +93,7 @@ public class SearchServiceResource extends BaseServiceResource {
 			SearchResult searchResult = mSearchController.getSearchResult(reqData.getSearchKey());
 			
 			TradesmenSearchResultResponseData respData = new TradesmenSearchResultResponseData();
-			if(searchResult.isComplete) {
+			if(searchResult.isComplete()) {
 				respData.setComplete(true);
 				if(searchResult.errors.isEmpty()) {
 					if(!searchResult.tradesmen.isEmpty()) {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.fixit.components.orders.OrderController;
 import com.fixit.core.dao.mongo.UserDao;
 import com.fixit.core.dao.sql.ProfessionDao;
+import com.fixit.core.data.OrderType;
 import com.fixit.core.data.mongo.OrderData;
 import com.fixit.core.data.mongo.User;
 import com.fixit.core.data.sql.JobReason;
@@ -63,7 +64,8 @@ public class OrderServiceResource extends BaseServiceResource {
 				if(user != null) {
 					JobReason[] jobReasons = reqData.getJobReasons();
 					OrderData orderData = mOrderController.orderTradesmen(
-							reqData.getProfessionId(),
+							OrderType.REGULAR,
+							profession,
 							user, 
 							reqData.getTradesmen(), 
 							reqData.getJobLocation(), 

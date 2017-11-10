@@ -10,6 +10,7 @@ import javax.ws.rs.core.Context;
 import org.springframework.stereotype.Component;
 
 import com.fixit.rest.resources.RestResource;
+import com.fixit.rest.resources.general.OrderHookResource;
 import com.fixit.rest.resources.general.TradesmanLeadHookResource;
 
 /**
@@ -28,6 +29,11 @@ public class GeneralResourceHandler implements RestResource {
 	@Path(TradesmanLeadHookResource.END_POINT)
 	public TradesmanLeadHookResource getTradesmanLeadHookResource() {
 		return context.getResource(TradesmanLeadHookResource.class);
+	}
+	
+	@Path(OrderHookResource.END_POINT)
+	public OrderHookResource getOrderHookResource() {
+		return context.getResource(OrderHookResource.class);
 	}
 	
 	@Override
