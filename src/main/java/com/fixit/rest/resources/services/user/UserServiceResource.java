@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fixit.components.orders.OrderController;
-import com.fixit.components.registration.UserRegistrationController;
-import com.fixit.components.registration.UserRegistrationController.RegistrationResult;
+import com.fixit.components.users.UserFactory;
+import com.fixit.components.users.UserRegistrationResult;
 import com.fixit.core.data.mongo.OrderData;
 import com.fixit.rest.resources.services.BaseServiceResource;
 import com.fixit.rest.resources.services.ServiceError;
@@ -32,12 +32,12 @@ public class UserServiceResource extends BaseServiceResource {
 
 	public final static String END_POINT = "users";
 	
-	private final UserRegistrationController mUserRegistrationController;
+	private final UserFactory mUserFactory;
 	private final OrderController mOrderController;
 	
 	@Autowired
-	public UserServiceResource(UserRegistrationController userRegistrationController, OrderController orderController) {
-		mUserRegistrationController = userRegistrationController;
+	public UserServiceResource(UserFactory userFactory, OrderController orderController) {
+		mUserFactory = userFactory;
 		mOrderController = orderController; 
 	}
 	
@@ -47,7 +47,7 @@ public class UserServiceResource extends BaseServiceResource {
 		ServiceResponseHeader respHeader = createRespHeader(request);
 		
 		if(!respHeader.hasErrors()) {
-			RegistrationResult result = mUserRegistrationController.findOrRegister(
+			UserRegistrationResult result = mUserFactory.createOrFindAppUser(
 					request.getData().toUser(), 
 					request.getHeader().getInstallationId()
 			);
@@ -56,7 +56,7 @@ public class UserServiceResource extends BaseServiceResource {
 				respHeader.addError(ServiceError.INVALID_DATA, "Invalid installationId");
 			} else {
 				List<OrderData> orderHistory = null;
-				if(!result.newUser) {
+				if(!result.newUser || result.wasTemp) {
 					orderHistory = mOrderController.getUserOrderHistory(result.user.get_id());
 				}
 				return new ServiceResponse<UserRegistrationResponseData>(respHeader, 

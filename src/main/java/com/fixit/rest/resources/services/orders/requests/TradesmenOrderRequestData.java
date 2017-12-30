@@ -6,6 +6,7 @@ package com.fixit.rest.resources.services.orders.requests;
 import java.util.Arrays;
 
 import com.fixit.core.data.JobLocation;
+import com.fixit.core.data.OrderType;
 import com.fixit.core.data.mongo.Tradesman;
 import com.fixit.core.data.sql.JobReason;
 import com.fixit.rest.resources.services.ServiceError;
@@ -18,12 +19,22 @@ import com.fixit.rest.resources.services.responses.ServiceResponseHeader;
  */
 public class TradesmenOrderRequestData implements RequestData {
 
+	private OrderType orderType;
 	private JobLocation jobLocation;
 	private int professionId;
 	private Tradesman[] tradesmen;
+	private String[] tradesmenIds;
 	private JobReason[] jobReasons;
 	private String comment;
 	
+	public OrderType getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(OrderType orderType) {
+		this.orderType = orderType;
+	}
+
 	public JobLocation getJobLocation() {
 		return jobLocation;
 	}
@@ -48,6 +59,14 @@ public class TradesmenOrderRequestData implements RequestData {
 		this.tradesmen = tradesmen;
 	}
 	
+	public String[] getTradesmenIds() {
+		return tradesmenIds;
+	}
+
+	public void setTradesmenIds(String[] tradesmenIds) {
+		this.tradesmenIds = tradesmenIds;
+	}
+
 	public JobReason[] getJobReasons() {
 		return jobReasons;
 	}
@@ -71,7 +90,8 @@ public class TradesmenOrderRequestData implements RequestData {
 		} else if(professionId < 0) {
 			respHeader.addError(ServiceError.INVALID_DATA, "Invalid professionId");
 		}
-		if(tradesmen == null || tradesmen.length == 0) {
+		if((orderType == null || orderType != OrderType.QUICK) && 
+				((tradesmen == null || tradesmen.length == 0) && (tradesmenIds == null || tradesmenIds.length == 0))) {
 			respHeader.addError(ServiceError.MISSING_DATA, "Missing tradesmen");
 		}
 		if(jobLocation == null) {
