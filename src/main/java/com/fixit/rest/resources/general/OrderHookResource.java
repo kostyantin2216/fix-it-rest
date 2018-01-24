@@ -20,17 +20,22 @@ import org.springframework.util.StringUtils;
 
 import com.fixit.components.orders.OrderController;
 import com.fixit.components.orders.OrderParams;
+import com.fixit.components.orders.OrderRequestController;
 import com.fixit.components.users.UserFactory;
 import com.fixit.core.dao.mongo.TradesmanDao;
 import com.fixit.core.dao.sql.ProfessionDao;
+import com.fixit.core.dao.sql.TrafficSourceDao;
+import com.fixit.core.data.OrderType;
 import com.fixit.core.data.mongo.CommonUser;
 import com.fixit.core.data.mongo.Tradesman;
 import com.fixit.core.data.sql.Profession;
+import com.fixit.core.data.sql.TrafficSource;
 import com.fixit.core.utils.Constants;
 import com.fixit.core.utils.Formatter;
 import com.fixit.rest.resources.RestResource;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -46,6 +51,9 @@ public class OrderHookResource implements RestResource {
 	private OrderController mOrderController;
 	
 	@Autowired
+	private OrderRequestController mOrderReqController;
+	
+	@Autowired
 	private UserFactory mUserFactory;
 	
 	@Autowired
@@ -54,31 +62,9 @@ public class OrderHookResource implements RestResource {
 	@Autowired
 	private TradesmanDao mTradesmanDao;
 	
-	@POST
-	@Path("quickOrder")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	public Response quickOrder(@FormParam("name") String name, @FormParam("email") String email, 
-							   @FormParam("telephone") String telephone, @FormParam("profession") String profession, 
-							   @FormParam("address") String address, @FormParam("comment") String comment) {
-		telephone = Formatter.normalizeTelephone(telephone);
-
-		String errorMsg = null;
-		OrderPreperation preperation = prepare(name, telephone, profession, address);
+	@Autowired
+	private TrafficSourceDao mTrafficSourceDao;
 	
-		if (StringUtils.isEmpty(preperation.errorMsg)) {
-			CommonUser user = mUserFactory.createOrFindCommonUser(name, email, telephone);
-			
-			Observable.just(OrderParams.quickOrder(user, preperation.profession, address, comment))
-					  .subscribeOn(Schedulers.io())
-					  .subscribe(orderParams -> {
-						  mOrderController.quickOrder(orderParams);
-					  });
-		} else {
-			errorMsg = preperation.errorMsg;
-		}
-		
-		return createResponse(errorMsg);
-	}
 	
 	@POST
 	@Path("directOrder")
@@ -86,38 +72,91 @@ public class OrderHookResource implements RestResource {
 	public Response directOrder(@FormParam("name") String name, @FormParam("email") String email, 
 							    @FormParam("telephone") String telephone, @FormParam("profession") String profession, 
 							    @FormParam("tradesmanId") String tradesmanId, @FormParam("address") String address,
-							    @FormParam("comment") String comment) {
-		telephone = Formatter.normalizeTelephone(telephone);
-
-		String errorMsg = null;
-		OrderPreperation preperation = prepare(name, telephone, profession, address);
-		
-		if(StringUtils.isEmpty(preperation.errorMsg)) {
-			if(StringUtils.isEmpty(tradesmanId)) {
-				errorMsg = "Missing tradesman";
-			} else {
-				Tradesman tradesman = mTradesmanDao.findById(new ObjectId(tradesmanId));
-				
-				if(tradesman == null) {
-					errorMsg = "Provided tradesman does not exist";
-				} else if(!tradesman.isActive()) {
-					errorMsg = "Provided tradesman is inactive";
-				} else {
-					CommonUser user = mUserFactory.createOrFindCommonUser(name, email, telephone);
-					
-					Observable.just(OrderParams.directOrder(user, tradesman, preperation.profession, address, comment))
-					  .subscribeOn(Schedulers.io())
-					  .subscribe(orderParams -> {
-							mOrderController.directOrder(orderParams);
-					  });
-				}
-			}
-		} else {
-			errorMsg = preperation.errorMsg;
-		}
-		
-		return createResponse(errorMsg);
+							    @FormParam("comment") String comment, @FormParam("trafficSourceId") String trafficSourceId) {
+		return createResponse(
+				order(
+					OrderType.DIRECT,
+					name, 
+					email,
+					telephone, 
+					profession, 
+					tradesmanId, 
+					address, 
+					comment, 
+					trafficSourceId, 
+					(orderParams) -> mOrderController.orderTradesmen(orderParams)
+				)
+		);
 	}	
+	
+	@POST
+	@Path("directOrderRequest")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response directOrderRequest(@FormParam("name") String name, @FormParam("email") String email, 
+							    @FormParam("telephone") String telephone, @FormParam("profession") String profession, 
+							    @FormParam("tradesmanId") String tradesmanId, @FormParam("address") String address,
+							    @FormParam("comment") String comment, @FormParam("trafficSourceId") String trafficSourceId) {
+		return createResponse(
+				order(
+					OrderType.DIRECT,
+					name, 
+					email,
+					telephone, 
+					profession, 
+					tradesmanId, 
+					address, 
+					comment, 
+					trafficSourceId, 
+					(orderParams) -> mOrderReqController.newRequest(orderParams)
+				)
+		);
+	}	
+	
+	@POST
+	@Path("quickOrder")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response quickOrder(@FormParam("name") String name, @FormParam("email") String email, 
+							   @FormParam("telephone") String telephone, @FormParam("profession") String profession, 
+							   @FormParam("address") String address, @FormParam("comment") String comment,
+							   @FormParam("trafficSourceId") String trafficSourceId) {
+		return createResponse(
+				order(
+					OrderType.QUICK,
+					name, 
+					email, 
+					telephone, 
+					profession, 
+					null,
+					address, 
+					comment, 
+					trafficSourceId, 
+					(orderParams) -> mOrderController.orderTradesmen(orderParams)
+				)
+		);
+	}
+	
+	@POST
+	@Path("quickOrderRequest")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response quickOrderRequest(@FormParam("name") String name, @FormParam("email") String email, 
+							   @FormParam("telephone") String telephone, @FormParam("profession") String profession, 
+							   @FormParam("address") String address, @FormParam("comment") String comment,
+							   @FormParam("trafficSourceId") String trafficSourceId) {		
+		return createResponse(
+				order(
+					OrderType.QUICK,
+					name, 
+					email, 
+					telephone, 
+					profession, 
+					null,
+					address, 
+					comment, 
+					trafficSourceId, 
+					(orderParams) -> mOrderReqController.newRequest(orderParams)
+				)
+		);
+	}
 	
 	private Response createResponse(String errorMsg) {
 		if(errorMsg != null) {
@@ -127,11 +166,66 @@ public class OrderHookResource implements RestResource {
 		}
 	}
 	
-	private OrderPreperation prepare(String name, String telephone, String profession, String address) {
+	private String order(OrderType orderType, String name, String email, String telephone, String profession, String tradesmanId, String address, 
+			   String comment, String trafficSourceId, Consumer<OrderParams> completeAction) {
+		telephone = Formatter.normalizeTelephone(telephone);
+		
+		String errorMsg = null;
+		OrderPreperation preperation = prepare(name, telephone, profession, address, trafficSourceId);
+		
+		if(StringUtils.isEmpty(preperation.errorMsg)) {
+			if(orderType == OrderType.DIRECT && StringUtils.isEmpty(tradesmanId)) {
+				errorMsg = "Missing tradesman";
+			} else {
+				OrderParams.Builder opBuilder = new OrderParams.Builder(orderType)
+						.forProfession(preperation.profession)
+						.atAddress(address)
+						.withComment(comment);
+				
+				if(orderType == OrderType.DIRECT) {
+					Tradesman tradesman = mTradesmanDao.findById(new ObjectId(tradesmanId));
+					
+					if(tradesman == null) {
+						errorMsg = "Provided tradesman does not exist";
+					} else if(!tradesman.isActive()) {
+						errorMsg = "Provided tradesman is inactive";
+					} else {
+						opBuilder.withTradesman(tradesman);
+					}
+				}
+				
+				if(StringUtils.isEmpty(errorMsg)) {
+					TrafficSource ts = mTrafficSourceDao.findById(Integer.parseInt(trafficSourceId));
+					if(ts != null) {					
+						CommonUser user = mUserFactory.createOrFindCommonUser(name, email, telephone);
+						Observable.just(
+								opBuilder.byUser(user)
+										 .fromTrafficSource(ts)
+										 .build()
+						  )
+						  .subscribeOn(Schedulers.io())
+						  .subscribe(completeAction);
+					} else {
+						errorMsg = "Could not find traffic source with id: " + trafficSourceId;
+					}
+				}
+			}
+		} else {
+			errorMsg = preperation.errorMsg;
+		}
+		
+		return errorMsg;
+	}
+	
+	private OrderPreperation prepare(String name, String telephone, String profession, String address, String trafficSourceId) {
 		Profession actualProfession = null;
 		String errorMsg = null;
 		
-		if(StringUtils.isEmpty(address)) {
+		if(StringUtils.isEmpty(trafficSourceId)) {
+			errorMsg = "Missing trafficSourceId";
+		} else if(!Formatter.isInteger(trafficSourceId)){
+			errorMsg = "trafficSourceId must be a valid integer";
+		} else if(StringUtils.isEmpty(address)) {
 			errorMsg = "Missing address";
 		} if(StringUtils.isEmpty(name)) {
 			errorMsg = "Missing name";
